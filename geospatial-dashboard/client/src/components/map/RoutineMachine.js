@@ -21,6 +21,7 @@ const createRoutineMachineLayer = ({ startpostion, endposition }) => {
 		fitSelectedRoutes: true,
 		showAlternatives: false,
 	});
+		//return instance;
 
 	return instance;
 };

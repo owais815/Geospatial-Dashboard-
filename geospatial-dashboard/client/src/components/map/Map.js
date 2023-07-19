@@ -1,3 +1,5 @@
+
+
 import styled from "styled-components";
 
 import {
@@ -14,6 +16,8 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import React, { useState, useEffect, useCallback } from "react";
 import RoutingMachine from "./RoutineMachine";
+import axios from 'axios';
+
 
 let DefaultIcon = L.icon({
 	iconUrl: icon,
@@ -72,52 +76,96 @@ const MapSection = ({ setTabIndex }) => {
 	// const destinationlocationData = useLocation(destination[0], destination[1]);
 	// console.log(destinationlocationData);
 
+	// 
+	
+
+
+
+
+
+
+
 	const fetchData = useCallback(
 		async (latitude, longitude, objKey) => {
-			let name = await fetch(
-				`https://us1.locationiq.com/v1/reverse.php?key=${process.env.REACT_APP_MAP_KEY}&lat=` +
-					latitude +
-					"&lon=" +
-					longitude +
-					"&format=json"
-			).then((response) => response.json());
-			// console.log(name);
-			// const address = name.address;
-			// const place =
-			// 	address &&
-			// 	(address.city ||
-			// 		address.town ||
-			// 		address.road ||
-			// 		address.suburb);
-			// address &&
-			// 	setName({
-			// 		...mapname,
-			// 		[objKey]: `${place}, ${address.country}`,
-			// 	});
+		  let name = await fetch(
+			`https://us1.locationiq.com/v1/reverse.php?key=pk.9a07f85f4ac6cd4d05721dacaa900b2d&lat=` +
+			  latitude +
+			  "&lon=" +
+			  longitude +
+			  "&format=json"
+		  ).then((response) => response.json());
+		  console.log(name);
+		  const address = name.address;
+		  const place =
+			address &&
+			(address.city ||
+			  address.town ||
+			  address.road ||
+			  address.suburb);
+		  address &&
+			setName({
+			  ...mapname,
+			  [objKey]: `${place}, ${address.country}`,
+			});
 		},
 		[mapname]
-	);
+	  );
 
+	  
+
+
+
+
+
+
+
+
+	  
+	// function LocationMarker() {
+	// 	const map = useMap();
+	// 	useMapEvents({
+	// 		click(e) {
+	// 			setDestination([e.latlng.lat, e.latlng.lng]);
+	// 			map.flyTo(e.latlng, map.getZoom());
+	// 		},
+	// 	});
+
+	// 	if (destination !== null && destination.length > 1) {
+	// 		return (
+	// 			<RoutingMachine
+	// 				startpostion={initialPosition}
+	// 				endposition={destination}
+	// 			/>
+	// 		);
+	// 	} else {
+	// 		return;
+	// 	}
+	// }
 	function LocationMarker() {
 		const map = useMap();
 		useMapEvents({
-			click(e) {
-				setDestination([e.latlng.lat, e.latlng.lng]);
-				map.flyTo(e.latlng, map.getZoom());
-			},
+		  click(e) {
+			const latitude = e.latlng.lat;
+			const longitude = e.latlng.lng;
+			setDestination([latitude, longitude]);
+			map.flyTo(e.latlng, map.getZoom());
+			sendCoordinates(latitude, longitude); // Call the function to send the coordinates
+		  },
 		});
-
+		
 		if (destination !== null && destination.length > 1) {
-			return (
-				<RoutingMachine
-					startpostion={initialPosition}
-					endposition={destination}
-				/>
-			);
-		} else {
-			return;
-		}
-	}
+					return (
+						<RoutingMachine
+							startpostion={initialPosition}
+							endposition={destination}
+						/>
+					);
+				} else {
+					return;
+				}
+			
+	  }
+	  
 
 	useEffect(() => {
 		navigator.geolocation.getCurrentPosition((position) => {
@@ -191,6 +239,18 @@ const MapSection = ({ setTabIndex }) => {
 		</StyledDiv>
 	);
 };
+const sendCoordinates = async (latitude, longitude) => {
+	try {
+	  const response = await axios.post('http://127.0.0.1:5000/api/sendCoordinates', {
+		latitude,
+		longitude,
+	  });
+	  console.log(response.data); // Optional: Handle the response from the backend
+	} catch (error) {
+	  console.error(error);
+	}
+  };
+  
 
 export default MapSection;
 
